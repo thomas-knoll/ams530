@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+#SBATCH --job-name=ams530_project1
+#SBATCH --output=project2.log
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=37
+#SBATCH --time=05:00
+#SBATCH -p short-40core
+
+# load an MPI module
+module load mvapich2/gcc12.1/2.3.7
+
+# set env variables which may help performance
+
+export MV2_HOMOGENEOUS_CLUSTER=1
+export MV2_ENABLE_AFFINITY=0
+
+# compile the code with the mpi compiler wrapper
+mpicc ./project2.c -o mpi_project2 -lm
+
+# execute the code with MPI
+mpirun ./mpi_project2 > output.out

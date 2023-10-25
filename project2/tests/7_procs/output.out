@@ -1,0 +1,6 @@
+Data size: 16384, time for my_Bcast: 0.000440
+Data size: 4096, time for my_Bcast: 0.000154
+Data size: 1024, time for my_Bcast: 0.000048
+Data size: 16384, time for MPI_Bcast: 0.000283
+Data size: 4096, time for MPI_Bcast: 0.000114
+Data size: 1024, time for MPI_Bcast: 0.000065

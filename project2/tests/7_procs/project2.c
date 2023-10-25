@@ -3,7 +3,7 @@
 #include <math.h>
 #include <mpi.h>
 
-void my_Bcast(double *data, int size, MPI_Datatype datatype, MPI_Comm comm, int N){
+void my_Bcast(double *data, int size, MPI_Datatype datatype, MPI_Comm comm){
     int rank, num_procs;
     MPI_Comm_rank(comm, &rank);
     MPI_Comm_size(comm, &num_procs);
@@ -36,7 +36,7 @@ void my_Bcast(double *data, int size, MPI_Datatype datatype, MPI_Comm comm, int 
 // Check the sum, to verify if the data has been broadcasted correctly
 // broadcast was successful, so this will be commented, in order to ensure a correct timing measurement
 //    double sum = 0;
-//    for (int i = 0; i < N; i++){
+//    for (int i = 0; i < size; i++){
 //        sum += data[i];
 //    }
 //    printf("my rank %d, sum = %f\n", rank, sum);
@@ -60,17 +60,63 @@ int main (int argc, char *argv[]) {
         }
      }
 
+// Test data size
+    int N2 = pow(2, 12); //datapoints
+    double *data2 = (double *)malloc(N2 * sizeof(double)); 
+    if (rank_main == 0) {
+ // Initialize data on the root process
+        for (int i = 0; i < N2; i++) {
+            data2[i] = (double)i;
+        }
+     }
+
+// Test data size
+    int N3 = pow(2, 10); //datapoints
+    double *data3 = (double *)malloc(N3 * sizeof(double)); 
+    if (rank_main == 0) {
+ // Initialize data on the root process
+        for (int i = 0; i < N3; i++) {
+            data3[i] = (double)i;
+        }
+     }
+
   // Time detection
      MPI_Barrier(MPI_COMM_WORLD);
      time_start = MPI_Wtime();
  // Perform custom broadcast
-     my_Bcast(data, N, MPI_DOUBLE, MPI_COMM_WORLD, N);
+     my_Bcast(data, N, MPI_DOUBLE, MPI_COMM_WORLD);
  // Now, data on all processes is updated
 // Time detection
     MPI_Barrier(MPI_COMM_WORLD);
     time_end = MPI_Wtime();
     if (rank_main==0) {
         printf("Data size: %d, time for my_Bcast: %f\n", N, time_end - time_start);
+    }
+
+  // Time detection
+     MPI_Barrier(MPI_COMM_WORLD);
+     time_start = MPI_Wtime();
+ // Perform custom broadcast
+     my_Bcast(data2, N2, MPI_DOUBLE, MPI_COMM_WORLD);
+ // Now, data on all processes is updated
+// Time detection
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_end = MPI_Wtime();
+    if (rank_main==0) {
+        printf("Data size: %d, time for my_Bcast: %f\n", N2, time_end - time_start);
+    }
+
+  // Time detection
+     MPI_Barrier(MPI_COMM_WORLD);
+     time_start = MPI_Wtime();
+ // Perform custom broadcast
+     my_Bcast(data3, N3, MPI_DOUBLE, MPI_COMM_WORLD);
+ // Now, data on all processes is updated
+// Time detection
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_end = MPI_Wtime();
+    if (rank_main==0) {
+        printf("Data size: %d, time for my_Bcast: %f\n", N3, time_end - time_start);
     }
 
  // Test MPI_Bcast
@@ -81,6 +127,22 @@ int main (int argc, char *argv[]) {
          }
     }
 
+ // Test MPI_Bcast
+     double *data_mpi2 = (double *)malloc(N2 * sizeof(double));
+     if (rank_main == 0) {
+         for (int i = 0; i < N2; i++) {
+             data_mpi2[i] = (double)i;
+         }
+    }
+
+ // Test MPI_Bcast
+     double *data_mpi3 = (double *)malloc(N3 * sizeof(double));
+     if (rank_main == 0) {
+         for (int i = 0; i < N3; i++) {
+             data_mpi3[i] = (double)i;
+         }
+    }
+
     MPI_Barrier(MPI_COMM_WORLD);
     time_start = MPI_Wtime();
     MPI_Bcast(data_mpi, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -88,6 +150,24 @@ int main (int argc, char *argv[]) {
     time_end = MPI_Wtime();
     if (rank_main==0) {
         printf("Data size: %d, time for MPI_Bcast: %f\n", N, time_end - time_start);
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_start = MPI_Wtime();
+    MPI_Bcast(data_mpi2, N2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_end = MPI_Wtime();
+    if (rank_main==0) {
+        printf("Data size: %d, time for MPI_Bcast: %f\n", N2, time_end - time_start);
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_start = MPI_Wtime();
+    MPI_Bcast(data_mpi3, N3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    time_end = MPI_Wtime();
+    if (rank_main==0) {
+        printf("Data size: %d, time for MPI_Bcast: %f\n", N3, time_end - time_start);
     }
 
     MPI_Finalize();
